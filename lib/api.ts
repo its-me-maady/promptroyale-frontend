@@ -107,6 +107,7 @@ export interface Department {
   subject_count: number;
   faculty_count: number;
   lead_faculty_email?: string | null;
+  assigned_staff_ids?: number[];
 }
 
 export interface BillingSnapshot {
@@ -135,6 +136,7 @@ export interface UserAdmin {
   name: string;
   role: string;
   status: string;
+  department_id?: number | null;
   department_name?: string | null;
   created_at: string;
 }

@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- [#7] Added dedicated "Faculty & Staff" tab and management directory in `components/AdminDashboard.tsx` with search, creation modal, and deletion capability (closes #7).
+- [#7] Added multi-select staff assignment checklist to department creation and department editing modals in `components/AdminDashboard.tsx`, displaying assigned staff pills on department cards.
+- [#7] Added student deletion button with confirmation in `components/FacultyPortal.tsx` and user account deletion button in `components/AdminDashboard.tsx`.
+- [#7] Updated `lib/api.ts` with `assigned_staff_ids` in `Department` and `department_id` in `UserAdmin`.
+- [#7] Added unit test cases in `tests/admin_faculty.test.ts` verifying staff data models and multi-select toggle logic.
 - [#5] Implemented Department Edit modal in `components/AdminDashboard.tsx` enabling administrators to update department code and name (closes #5).
 - [#5] Enhanced Add Department modal with mandatory primary faculty credentials (name, institutional email, password) to atomically staff new departments.
 - [#5] Displayed Lead Faculty email on department directory cards in `components/AdminDashboard.tsx`.

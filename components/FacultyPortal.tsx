@@ -26,7 +26,8 @@ import {
   Edit2,
   X,
   UserCheck,
-  UserMinus
+  UserMinus,
+  Trash2
 } from "lucide-react";
 
 export const FacultyPortal: React.FC = () => {
@@ -256,6 +257,23 @@ export const FacultyPortal: React.FC = () => {
       loadSubjects();
     } catch (err: any) {
       alert(err.message || "Failed to update subject membership");
+    }
+  };
+
+  const handleDeleteStudent = async (studentId: number, studentName: string) => {
+    if (
+      !confirm(
+        `Are you sure you want to permanently delete student "${studentName}"? All their course enrollments and records will be deleted.`
+      )
+    ) {
+      return;
+    }
+    try {
+      await apiFetch(`/api/students/${studentId}`, { method: "DELETE" });
+      setStudents((prev) => prev.filter((s) => s.id !== studentId));
+      loadSubjects();
+    } catch (err: any) {
+      alert(err.message || "Failed to delete student");
     }
   };
 
@@ -652,13 +670,22 @@ export const FacultyPortal: React.FC = () => {
                         </span>
                       </td>
                       <td className="p-3 text-right">
-                        <button
-                          onClick={() => handleOpenEditStudent(stu)}
-                          className="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-xs font-medium inline-flex items-center gap-1 transition-colors"
-                        >
-                          <Edit2 className="w-3 h-3 text-sky-400" />
-                          <span>Edit</span>
-                        </button>
+                        <div className="inline-flex items-center gap-1.5">
+                          <button
+                            onClick={() => handleOpenEditStudent(stu)}
+                            className="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-xs font-medium inline-flex items-center gap-1 transition-colors"
+                          >
+                            <Edit2 className="w-3 h-3 text-sky-400" />
+                            <span>Edit</span>
+                          </button>
+                          <button
+                            onClick={() => handleDeleteStudent(stu.id, stu.name)}
+                            className="p-1.5 bg-red-950/50 hover:bg-red-900/80 text-red-400 hover:text-red-200 border border-red-800/50 rounded-lg text-xs font-medium inline-flex items-center gap-1 transition-colors"
+                            title="Delete Student"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}
