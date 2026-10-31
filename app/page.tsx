@@ -5,6 +5,7 @@ import { useAuth } from "@/components/AuthContext";
 import { LoginForm } from "@/components/LoginForm";
 import { StudentMobileApp } from "@/components/StudentMobileApp";
 import { FacultyPortal } from "@/components/FacultyPortal";
+import { AdminDashboard } from "@/components/AdminDashboard";
 import { GraduationCap } from "lucide-react";
 
 export default function Home() {
@@ -31,6 +32,11 @@ export default function Home() {
     return <StudentMobileApp />;
   }
 
-  // 3. Faculty / Admin -> Render Desktop Web Portal
+  // 3. College Administrator -> Render Dedicated Admin Dashboard
+  if (user.role === "college_admin") {
+    return <AdminDashboard />;
+  }
+
+  // 4. Faculty / Department User -> Render Academic Department Portal
   return <FacultyPortal />;
 }
