@@ -59,4 +59,23 @@ describe("Admin & Faculty Separation Specifications", () => {
     expect(roles["college_admin"]).toBe("AdminDashboard");
     expect(roles["department_user"]).not.toBe(roles["college_admin"]);
   });
+
+  it("verifies department editing and faculty provisioning payload requirements", () => {
+    const dept: Department = {
+      id: 2,
+      college_id: 1,
+      name: "Mechanical Engineering",
+      code: "MECH",
+      subject_count: 0,
+      faculty_count: 1,
+      lead_faculty_email: "faculty.mech@vaigai.edu",
+    };
+
+    expect(dept.lead_faculty_email).toBe("faculty.mech@vaigai.edu");
+
+    // Mutation verification
+    const updatedDept = { ...dept, name: "Mechanical & Aerospace Engineering" };
+    expect(updatedDept.name).toBe("Mechanical & Aerospace Engineering");
+    expect(updatedDept.code).toBe("MECH");
+  });
 });

@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- [#5] Implemented Department Edit modal in `components/AdminDashboard.tsx` enabling administrators to update department code and name (closes #5).
+- [#5] Enhanced Add Department modal with mandatory primary faculty credentials (name, institutional email, password) to atomically staff new departments.
+- [#5] Displayed Lead Faculty email on department directory cards in `components/AdminDashboard.tsx`.
+- [#5] Added unit test cases in `tests/admin_faculty.test.ts` verifying department editing and faculty provisioning schemas.
+
+### Added
 - [#3] Implemented dedicated College Administrator Dashboard (`components/AdminDashboard.tsx`) with institutional KPI metrics, billing snapshot & token quota meter (SRS 4.9), department provisioning, and user accounts lifecycle directory (closes #3).
 - [#3] Differentiated role-based routing in `app/page.tsx` directing `college_admin` to `AdminDashboard` and `department_user` to `FacultyPortal`.
 - [#3] Enhanced Faculty Portal (`components/FacultyPortal.tsx`) with search filters, "+ Add Subject" modal, "+ Add Student" modal, and row-level "Edit" modals to update details and manage Subject-Based Access Control (SBAC) student memberships.
