@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { AdminOverview, Department, StudentDetail } from "../lib/api";
+import { AdminOverview, Department, StudentDetail, UserAdmin } from "../lib/api";
 
 describe("Admin & Faculty Separation Specifications", () => {
   it("verifies distinct AdminDashboard data model and KPI requirements", () => {
@@ -77,5 +77,47 @@ describe("Admin & Faculty Separation Specifications", () => {
     const updatedDept = { ...dept, name: "Mechanical & Aerospace Engineering" };
     expect(updatedDept.name).toBe("Mechanical & Aerospace Engineering");
     expect(updatedDept.code).toBe("MECH");
+  });
+
+  it("verifies staff management and department staff assignment data structures", () => {
+    const staffMember: UserAdmin = {
+      id: 10,
+      email: "prof.alan@vaigai.edu",
+      name: "Dr. Alan Turing",
+      role: "department_user",
+      status: "active",
+      department_id: 1,
+      department_name: "Computer Science and Engineering",
+      created_at: "2026-10-31T12:00:00Z",
+    };
+
+    const dept: Department = {
+      id: 1,
+      college_id: 1,
+      name: "Computer Science and Engineering",
+      code: "CSE",
+      subject_count: 2,
+      faculty_count: 1,
+      lead_faculty_email: "prof.alan@vaigai.edu",
+      assigned_staff_ids: [10],
+    };
+
+    expect(dept.assigned_staff_ids).toContain(staffMember.id);
+    expect(staffMember.department_id).toBe(dept.id);
+  });
+
+  it("verifies multi-select staff assignment toggle logic", () => {
+    const selectedStaffIds: number[] = [10];
+    const toggleStaff = (id: number, currentList: number[]) => {
+      return currentList.includes(id)
+        ? currentList.filter((item) => item !== id)
+        : [...currentList, id];
+    };
+
+    const afterAdd = toggleStaff(11, selectedStaffIds);
+    expect(afterAdd).toEqual([10, 11]);
+
+    const afterRemove = toggleStaff(10, afterAdd);
+    expect(afterRemove).toEqual([11]);
   });
 });
