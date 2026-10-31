@@ -17,6 +17,7 @@ export interface Subject {
   description: string;
   department_id: number;
   document_count: number;
+  enrolled_student_count?: number;
 }
 
 export interface Document {
@@ -70,6 +71,71 @@ export interface QuizSubmitResponse {
   accuracy_percentage: number;
   time_taken_seconds: number;
   review: QuizQuestionReview[];
+}
+
+// Student Management Interfaces
+export interface StudentEnrolledSubject {
+  id: number;
+  code: string;
+  name: string;
+}
+
+export interface StudentDetail {
+  id: number;
+  email: string;
+  name: string;
+  role: string;
+  status: string;
+  enrolled_subjects: number[];
+  enrolled_subject_details: StudentEnrolledSubject[];
+}
+
+export interface SubjectStudents {
+  subject_id: number;
+  subject_code: string;
+  subject_name: string;
+  enrolled: StudentDetail[];
+  available_students: StudentDetail[];
+}
+
+// Admin Governance Interfaces
+export interface Department {
+  id: number;
+  college_id: number;
+  name: string;
+  code: string;
+  subject_count: number;
+  faculty_count: number;
+}
+
+export interface BillingSnapshot {
+  snapshot_date: string;
+  active_student_count: number;
+  monthly_token_quota: number;
+  tokens_consumed: number;
+  tier: string;
+}
+
+export interface AdminOverview {
+  college_id: number;
+  college_name: string;
+  college_domain: string;
+  department_count: number;
+  subject_count: number;
+  student_count: number;
+  faculty_count: number;
+  billing_snapshot: BillingSnapshot;
+  ai_status: string;
+}
+
+export interface UserAdmin {
+  id: number;
+  email: string;
+  name: string;
+  role: string;
+  status: string;
+  department_name?: string | null;
+  created_at: string;
 }
 
 function getAuthHeader(): Record<string, string> {

@@ -8,6 +8,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- [#3] Implemented dedicated College Administrator Dashboard (`components/AdminDashboard.tsx`) with institutional KPI metrics, billing snapshot & token quota meter (SRS 4.9), department provisioning, and user accounts lifecycle directory (closes #3).
+- [#3] Differentiated role-based routing in `app/page.tsx` directing `college_admin` to `AdminDashboard` and `department_user` to `FacultyPortal`.
+- [#3] Enhanced Faculty Portal (`components/FacultyPortal.tsx`) with search filters, "+ Add Subject" modal, "+ Add Student" modal, and row-level "Edit" modals to update details and manage Subject-Based Access Control (SBAC) student memberships.
+- [#3] Removed institutional demo credentials helper box from `components/LoginForm.tsx` ensuring clean production login interface.
+- [#3] Added Vitest unit test suite in `tests/admin_faculty.test.ts` verifying role routing, admin models, and SBAC search/membership logic.
+
+### Added
 - [#1] Implemented authentic institutional login for Vaigai College with JWT session state management in `components/LoginForm.tsx` and `components/AuthContext.tsx` (closes #1).
 - [#1] Implemented Prompt Royale Student Mobile App shell in `components/StudentMobileApp.tsx` featuring mobile device frame, status bar, and bottom navigation.
 - [#1] Implemented Grounded Academic Q&A chat with subject picker and interactive citation drawer in `components/StudentQAChat.tsx` and `components/CitationDrawer.tsx`.

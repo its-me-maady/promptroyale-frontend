@@ -98,16 +98,6 @@ export const LoginForm: React.FC = () => {
             )}
           </button>
         </form>
-
-        {/* Demo Credentials Reference Card */}
-        <div className="mt-8 pt-6 border-t border-slate-700/80">
-          <p className="text-xs font-medium text-slate-400 mb-2">Institutional Demo Credentials:</p>
-          <div className="space-y-1.5 text-xs text-slate-300 bg-slate-950/50 p-3 rounded-lg border border-slate-800 font-mono">
-            <div><span className="text-sky-400">Student:</span> adhithiyan@vaigai.edu (Vaigai@123)</div>
-            <div><span className="text-emerald-400">Faculty:</span> faculty.cse@vaigai.edu (Vaigai@123)</div>
-            <div><span className="text-amber-400">Admin:</span> admin@vaigai.edu (Vaigai@123)</div>
-          </div>
-        </div>
       </div>
     </div>
   );
