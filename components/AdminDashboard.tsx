@@ -17,7 +17,10 @@ import {
   CheckCircle2,
   AlertTriangle,
   XCircle,
-  X
+  X,
+  Edit2,
+  Mail,
+  Lock
 } from "lucide-react";
 
 export const AdminDashboard: React.FC = () => {
@@ -28,11 +31,20 @@ export const AdminDashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState<"departments" | "users">("departments");
   const [loading, setLoading] = useState(true);
 
-  // Department Modal State
+  // Add Department State
   const [isDeptModalOpen, setIsDeptModalOpen] = useState(false);
   const [deptName, setDeptName] = useState("");
   const [deptCode, setDeptCode] = useState("");
+  const [facultyName, setFacultyName] = useState("");
+  const [facultyEmail, setFacultyEmail] = useState("");
+  const [facultyPassword, setFacultyPassword] = useState("Vaigai@123");
   const [submittingDept, setSubmittingDept] = useState(false);
+
+  // Edit Department State
+  const [editingDept, setEditingDept] = useState<Department | null>(null);
+  const [editDeptName, setEditDeptName] = useState("");
+  const [editDeptCode, setEditDeptCode] = useState("");
+  const [submittingEditDept, setSubmittingEditDept] = useState(false);
 
   // Search & Filter State
   const [deptSearch, setDeptSearch] = useState("");
@@ -64,24 +76,64 @@ export const AdminDashboard: React.FC = () => {
 
   const handleCreateDepartment = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!deptName || !deptCode) return;
+    if (!deptName || !deptCode || !facultyEmail || !facultyPassword) return;
     setSubmittingDept(true);
     try {
       const created = await apiFetch<Department>("/api/admin/departments", {
         method: "POST",
-        body: JSON.stringify({ name: deptName, code: deptCode }),
+        body: JSON.stringify({
+          name: deptName,
+          code: deptCode,
+          faculty_name: facultyName,
+          faculty_email: facultyEmail,
+          faculty_password: facultyPassword,
+        }),
       });
       setDepartments((prev) => [...prev, created]);
       setIsDeptModalOpen(false);
       setDeptName("");
       setDeptCode("");
-      // Refresh overview
-      const ov = await apiFetch<AdminOverview>("/api/admin/overview");
+      setFacultyName("");
+      setFacultyEmail("");
+      setFacultyPassword("Vaigai@123");
+      // Refresh overview and users list
+      const [ov, uData] = await Promise.all([
+        apiFetch<AdminOverview>("/api/admin/overview"),
+        apiFetch<UserAdmin[]>("/api/admin/users"),
+      ]);
       setOverview(ov);
+      setUsersList(uData);
     } catch (err: any) {
       alert(err.message || "Failed to create department");
     } finally {
       setSubmittingDept(false);
+    }
+  };
+
+  const handleOpenEditDept = (dept: Department) => {
+    setEditingDept(dept);
+    setEditDeptName(dept.name);
+    setEditDeptCode(dept.code);
+  };
+
+  const handleSaveEditDept = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingDept || !editDeptName || !editDeptCode) return;
+    setSubmittingEditDept(true);
+    try {
+      const updated = await apiFetch<Department>(`/api/admin/departments/${editingDept.id}`, {
+        method: "PUT",
+        body: JSON.stringify({
+          name: editDeptName,
+          code: editDeptCode,
+        }),
+      });
+      setDepartments((prev) => prev.map((d) => (d.id === updated.id ? updated : d)));
+      setEditingDept(null);
+    } catch (err: any) {
+      alert(err.message || "Failed to update department");
+    } finally {
+      setSubmittingEditDept(false);
     }
   };
 
@@ -255,18 +307,35 @@ export const AdminDashboard: React.FC = () => {
               {filteredDepartments.map((dept) => (
                 <div
                   key={dept.id}
-                  className="p-5 bg-slate-950 border border-slate-800/80 rounded-xl hover:border-slate-700 transition-colors"
+                  className="p-5 bg-slate-950 border border-slate-800/80 rounded-xl hover:border-slate-700 transition-colors flex flex-col justify-between"
                 >
-                  <div className="flex items-center justify-between mb-3">
-                    <span className="px-2.5 py-1 bg-amber-950/60 border border-amber-800/50 rounded-lg text-amber-300 font-mono text-xs font-bold">
-                      {dept.code}
-                    </span>
-                    <span className="text-[11px] text-slate-400 flex items-center gap-1">
-                      <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-                      Active
-                    </span>
+                  <div>
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="px-2.5 py-1 bg-amber-950/60 border border-amber-800/50 rounded-lg text-amber-300 font-mono text-xs font-bold">
+                        {dept.code}
+                      </span>
+                      <div className="flex items-center gap-1.5">
+                        <button
+                          onClick={() => handleOpenEditDept(dept)}
+                          className="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-xs font-medium inline-flex items-center gap-1 transition-colors"
+                        >
+                          <Edit2 className="w-3 h-3 text-amber-400" />
+                          <span>Edit</span>
+                        </button>
+                        <span className="text-[11px] text-slate-400 flex items-center gap-1">
+                          <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+                          Active
+                        </span>
+                      </div>
+                    </div>
+                    <h4 className="text-sm font-bold text-white mb-1.5">{dept.name}</h4>
+                    {dept.lead_faculty_email && (
+                      <p className="text-[11px] text-slate-400 flex items-center gap-1 mb-3 font-mono">
+                        <Mail className="w-3 h-3 text-amber-400 shrink-0" />
+                        <span className="truncate">{dept.lead_faculty_email}</span>
+                      </p>
+                    )}
                   </div>
-                  <h4 className="text-sm font-bold text-white mb-3">{dept.name}</h4>
                   <div className="pt-3 border-t border-slate-800/80 flex items-center justify-between text-xs text-slate-400">
                     <span>Subjects: <strong className="text-white">{dept.subject_count}</strong></span>
                     <span>Faculty: <strong className="text-white">{dept.faculty_count}</strong></span>
@@ -395,14 +464,14 @@ export const AdminDashboard: React.FC = () => {
           </div>
         )}
 
-        {/* Modal: Add Department */}
+        {/* Modal: Add Department with Faculty Provisioning */}
         {isDeptModalOpen && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
             <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 w-full max-w-md shadow-2xl">
               <div className="flex items-center justify-between mb-4">
                 <h4 className="text-sm font-bold text-white flex items-center gap-2">
                   <Building className="w-4 h-4 text-amber-400" />
-                  Add Academic Department
+                  Add Department & Provision Faculty
                 </h4>
                 <button
                   onClick={() => setIsDeptModalOpen(false)}
@@ -422,7 +491,7 @@ export const AdminDashboard: React.FC = () => {
                     required
                     value={deptCode}
                     onChange={(e) => setDeptCode(e.target.value)}
-                    placeholder="e.g. ECE, MECH, IT"
+                    placeholder="e.g. MECH, IT, ECE"
                     className="w-full bg-slate-950 border border-slate-700 text-white px-3.5 py-2 rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-amber-400 uppercase font-mono"
                   />
                 </div>
@@ -436,9 +505,57 @@ export const AdminDashboard: React.FC = () => {
                     required
                     value={deptName}
                     onChange={(e) => setDeptName(e.target.value)}
-                    placeholder="e.g. Electronics & Communication Engineering"
+                    placeholder="e.g. Mechanical Engineering"
                     className="w-full bg-slate-950 border border-slate-700 text-white px-3.5 py-2 rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-amber-400"
                   />
+                </div>
+
+                <div className="pt-2 border-t border-slate-800 space-y-3">
+                  <p className="text-[11px] font-semibold text-amber-400 flex items-center gap-1.5 uppercase tracking-wider">
+                    <Users className="w-3.5 h-3.5" />
+                    Primary Faculty / Lead Account Credentials
+                  </p>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-400 mb-1">
+                      Faculty Full Name
+                    </label>
+                    <input
+                      type="text"
+                      value={facultyName}
+                      onChange={(e) => setFacultyName(e.target.value)}
+                      placeholder="e.g. Dr. S. Kumar (HOD)"
+                      className="w-full bg-slate-950 border border-slate-700 text-white px-3.5 py-2 rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-amber-400"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-400 mb-1">
+                      Faculty Institutional Email ID
+                    </label>
+                    <input
+                      type="email"
+                      required
+                      value={facultyEmail}
+                      onChange={(e) => setFacultyEmail(e.target.value)}
+                      placeholder="faculty.mech@vaigai.edu"
+                      className="w-full bg-slate-950 border border-slate-700 text-white px-3.5 py-2 rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-amber-400 font-mono"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-400 mb-1">
+                      Initial Faculty Password
+                    </label>
+                    <input
+                      type="password"
+                      required
+                      value={facultyPassword}
+                      onChange={(e) => setFacultyPassword(e.target.value)}
+                      placeholder="••••••••••••"
+                      className="w-full bg-slate-950 border border-slate-700 text-white px-3.5 py-2 rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-amber-400 font-mono"
+                    />
+                  </div>
                 </div>
 
                 <div className="flex justify-end gap-2 pt-2">
@@ -454,7 +571,79 @@ export const AdminDashboard: React.FC = () => {
                     disabled={submittingDept}
                     className="px-4 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 font-bold text-xs hover:from-amber-400"
                   >
-                    {submittingDept ? "Creating..." : "Save Department"}
+                    {submittingDept ? "Creating & Provisioning..." : "Save Department & Faculty"}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* Modal: Edit Department */}
+        {editingDept && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+            <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 w-full max-w-md shadow-2xl">
+              <div className="flex items-center justify-between mb-4">
+                <h4 className="text-sm font-bold text-white flex items-center gap-2">
+                  <Edit2 className="w-4 h-4 text-amber-400" />
+                  Edit Department ({editingDept.code})
+                </h4>
+                <button
+                  onClick={() => setEditingDept(null)}
+                  className="text-slate-400 hover:text-white"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              <form onSubmit={handleSaveEditDept} className="space-y-4">
+                <div>
+                  <label className="block text-xs font-semibold text-slate-400 mb-1">
+                    Department Code
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={editDeptCode}
+                    onChange={(e) => setEditDeptCode(e.target.value)}
+                    className="w-full bg-slate-950 border border-slate-700 text-white px-3.5 py-2 rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-amber-400 uppercase font-mono"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-slate-400 mb-1">
+                    Department Full Name
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={editDeptName}
+                    onChange={(e) => setEditDeptName(e.target.value)}
+                    className="w-full bg-slate-950 border border-slate-700 text-white px-3.5 py-2 rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-amber-400"
+                  />
+                </div>
+
+                {editingDept.lead_faculty_email && (
+                  <div className="p-3 bg-slate-950 border border-slate-800 rounded-xl">
+                    <p className="text-[11px] text-slate-400">Assigned Faculty Lead Email:</p>
+                    <p className="text-xs font-mono text-amber-400">{editingDept.lead_faculty_email}</p>
+                  </div>
+                )}
+
+                <div className="flex justify-end gap-2 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => setEditingDept(null)}
+                    className="px-4 py-2 rounded-xl bg-slate-800 text-slate-300 text-xs font-medium hover:bg-slate-700"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={submittingEditDept}
+                    className="px-4 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 font-bold text-xs hover:from-amber-400"
+                  >
+                    {submittingEditDept ? "Saving..." : "Update Department"}
                   </button>
                 </div>
               </form>

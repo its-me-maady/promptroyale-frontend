@@ -106,6 +106,7 @@ export interface Department {
   code: string;
   subject_count: number;
   faculty_count: number;
+  lead_faculty_email?: string | null;
 }
 
 export interface BillingSnapshot {
